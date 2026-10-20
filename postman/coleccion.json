@@ -1,0 +1,148 @@
+{
+  "info": {
+    "name": "TP TecWeb - Backend Recetas",
+    "description": "Colección de casos de uso del backend NestJS (Categorías y Recetas con relación 1 a N). Requiere la app corriendo en localhost:3000.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" }
+  ],
+  "item": [
+    {
+      "name": "Categorías",
+      "item": [
+        {
+          "name": "Crear categoría",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/categorias", "host": ["{{baseUrl}}"], "path": ["categorias"] },
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Postres\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Listar categorías",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/categorias", "host": ["{{baseUrl}}"], "path": ["categorias"] }
+          }
+        },
+        {
+          "name": "Obtener categoría por id",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/categorias/1", "host": ["{{baseUrl}}"], "path": ["categorias", "1"] }
+          }
+        },
+        {
+          "name": "Editar categoría",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/categorias/1", "host": ["{{baseUrl}}"], "path": ["categorias", "1"] },
+            "body": { "mode": "raw", "raw": "{\n  \"nombre\": \"Postres dulces\"\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Eliminar categoría",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/categorias/1", "host": ["{{baseUrl}}"], "path": ["categorias", "1"] }
+          }
+        },
+        {
+          "name": "ERROR: obtener categoría inexistente (404)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/categorias/99999", "host": ["{{baseUrl}}"], "path": ["categorias", "99999"] }
+          }
+        },
+        {
+          "name": "ERROR: crear sin nombre (400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/categorias", "host": ["{{baseUrl}}"], "path": ["categorias"] },
+            "body": { "mode": "raw", "raw": "{}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "ERROR: eliminar categoría con recetas (409)",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/categorias/1", "host": ["{{baseUrl}}"], "path": ["categorias", "1"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Recetas",
+      "item": [
+        {
+          "name": "Crear receta",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/recetas", "host": ["{{baseUrl}}"], "path": ["recetas"] },
+            "body": { "mode": "raw", "raw": "{\n  \"idCategoria\": 1,\n  \"nombre\": \"Flan casero\",\n  \"tiempo\": 40,\n  \"ingredientes\": \"4 huevos, 500 ml de leche, 200 g de azúcar\",\n  \"preparacion\": \"Batir los huevos con el azúcar, agregar la leche, horno a baño maría por 40 minutos.\",\n  \"porciones\": 6\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Listar recetas",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/recetas", "host": ["{{baseUrl}}"], "path": ["recetas"] }
+          }
+        },
+        {
+          "name": "Filtrar recetas por categoría",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/recetas?categoria=1", "host": ["{{baseUrl}}"], "path": ["recetas"], "query": [{ "key": "categoria", "value": "1" }] }
+          }
+        },
+        {
+          "name": "Obtener receta por id",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/recetas/1", "host": ["{{baseUrl}}"], "path": ["recetas", "1"] }
+          }
+        },
+        {
+          "name": "Editar receta",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/recetas/1", "host": ["{{baseUrl}}"], "path": ["recetas", "1"] },
+            "body": { "mode": "raw", "raw": "{\n  \"tiempo\": 45\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "Eliminar receta",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "{{baseUrl}}/recetas/1", "host": ["{{baseUrl}}"], "path": ["recetas", "1"] }
+          }
+        },
+        {
+          "name": "ERROR: crear receta con categoría inexistente (404)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/recetas", "host": ["{{baseUrl}}"], "path": ["recetas"] },
+            "body": { "mode": "raw", "raw": "{\n  \"idCategoria\": 99999,\n  \"nombre\": \"Test\",\n  \"tiempo\": 10,\n  \"ingredientes\": \"x\",\n  \"preparacion\": \"x\",\n  \"porciones\": 1\n}", "options": { "raw": { "language": "json" } } }
+          }
+        },
+        {
+          "name": "ERROR: crear receta sin campos (400)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/recetas", "host": ["{{baseUrl}}"], "path": ["recetas"] },
+            "body": { "mode": "raw", "raw": "{}", "options": { "raw": { "language": "json" } } }
+          }
+        }
+      ]
+    }
+  ]
+}
