@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Receta } from '../recetas/entities/receta.entity.js';
 import { CreateCategoriaDto } from './dto/create-categoria.dto.js';
 import { UpdateCategoriaDto } from './dto/update-categoria.dto.js';
 import { Categoria } from './entities/categoria.entity.js';
@@ -10,6 +11,8 @@ export class CategoriasService {
   constructor(
     @InjectRepository(Categoria)
     private categoriasRepository: Repository<Categoria>,
+    @InjectRepository(Receta)
+    private recetasRepository: Repository<Receta>,
   ) {}
 
   create(createCategoriaDto: CreateCategoriaDto): Promise<Categoria> {
@@ -39,6 +42,14 @@ export class CategoriasService {
 
   async remove(id: number): Promise<void> {
     const categoria = await this.findOne(id);
+    const recetasAsociadas = await this.recetasRepository.count({
+      where: { categoria: { id } },
+    });
+    if (recetasAsociadas > 0) {
+      throw new ConflictException(
+        `No se puede eliminar la categoría ${id}: tiene ${recetasAsociadas} receta(s) asociada(s). Eliminá primero esas recetas.`,
+      );
+    }
     await this.categoriasRepository.remove(categoria);
   }
 }
