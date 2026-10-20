@@ -1,0 +1,21 @@
+# Dependencies
+/node_modules
+
+# Build
+/dist
+/build
+
+# Env — no subir contraseñas al repo
+.env
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Test / coverage
+/coverage
+
+# OS
+.DS_Store
+Thumbs.db
