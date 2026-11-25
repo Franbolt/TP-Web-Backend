@@ -1,124 +1,149 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# TP Web — Backend (NestJS)
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+API REST para una aplicación de recetas de cocina. Expone CRUD para dos entidades relacionadas y es el backend del frontend de este TP.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Modelo de datos
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
-```bash
-$ npm install
+```mermaid
+erDiagram
+    CATEGORIA ||--o{ RECETA : tiene
+    CATEGORIA {
+        int id PK
+        string nombre
+    }
+    RECETA {
+        int id PK
+        int idCategoria FK
+        string nombre
+        int tiempo
+        string ingredientes
+        string preparacion
+        int porciones
+    }
 ```
 
-## Compile and run the project
+La foreign key vive en `Receta` (lado N). Los `GET` de recetas devuelven la categoría anidada:
 
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```json
+{
+  "id": 1,
+  "nombre": "Flan casero",
+  "tiempo": 60,
+  "ingredientes": "Leche, huevos, azúcar",
+  "preparacion": "Cocinar a baño maría",
+  "porciones": 6,
+  "categoria": { "id": 1, "nombre": "Postres" }
+}
 ```
 
-## Run tests
+## Stack
+
+NestJS 12, TypeORM, PostgreSQL, `ConfigModule`, `class-validator` / `class-transformer`.
+
+## Requisitos
+
+- Node.js 24
+- PostgreSQL local (Docker) o una instancia remota
+
+## Arranco local
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Base de datos local con Docker:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+docker run --name recetas-postgres -e POSTGRES_PASSWORD=secret123! -e POSTGRES_DB=recetas -p 5432:5432 -d postgres:16
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Crear `.env` en la raíz (no versionado):
 
-## Observability
-
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
-
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
-
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
-
-To add it to this project:
+```env
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=secret123!
+DB_NAME=recetas
+```
 
 ```bash
-$ npm install @nestjs/observe
+npm run start:dev     # http://localhost:3000
 ```
 
-Then follow the [setup guide](https://docs.nestjs.com/observability/overview) - it takes a single import and an app key.
+Si se usa una instancia remota (por ejemplo Render), se puede definir `DATABASE_URL` en lugar de las variables `DB_*`.
 
-The free plan needs no payment details and covers 300,000 events a month. You can also browse the [live demo](https://www.observe-demo.nestjs.com/dashboard) first - the whole dashboard over a busy service's data, with nothing to install.
+## Endpoints
 
-## Resources
+| Método | Ruta | Descripción | Código |
+| --- | --- | --- | --- |
+| `POST` | `/categorias` | Crear categoría (`{ "nombre": "Postres" }`) | 201 |
+| `GET` | `/categorias` | Listar categorías | 200 |
+| `GET` | `/categorias/:id` | Obtener una categoría | 200 |
+| `PUT` | `/categorias/:id` | Modificar categoría | 200 |
+| `DELETE` | `/categorias/:id` | Borrar categoría | 204 |
+| `POST` | `/recetas` | Crear receta | 201 |
+| `GET` | `/recetas` | Listar recetas | 200 |
+| `GET` | `/recetas?categoria=1` | Filtrar recetas por categoría | 200 |
+| `GET` | `/recetas/:id` | Obtener una receta | 200 |
+| `PUT` | `/recetas/:id` | Modificar receta | 200 |
+| `DELETE` | `/recetas/:id` | Borrar receta | 204 |
 
-Check out a few resources that may come in handy when working with NestJS:
+Body para `POST /recetas` (y `PUT`):
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observe](https://observe.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```json
+{
+  "idCategoria": 1,
+  "nombre": "Flan casero",
+  "tiempo": 60,
+  "ingredientes": "Leche, huevos, azúcar, caramelo",
+  "preparacion": "Cocinar a baño maría",
+  "porciones": 6
+}
+```
 
-## Support
+Se envía `idCategoria` (la FK), no el objeto `categoria`: el DTO solo acepta los campos declarados y `whitelist: true` descarta el resto.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Validaciones y errores
 
-## Stay in touch
+- `ValidationPipe` global con `whitelist: true`: descarta campos no declarados en los DTO.
+- `ParseIntPipe` en los `:id`: un id no numérico responde 400.
+- DTOs con `@IsString`, `@IsNotEmpty` y `@IsInt`.
+- **400**: body inválido. **404**: el id no existe. **409**: intentar borrar una categoría que tiene recetas; el mensaje indica cuántas y pide borrarlas primero.
+- **204** en los `DELETE` (`@HttpCode(204)`).
+- `app.enableCors()` en `main.ts` permite consumir la API desde `http://localhost:4200` y desde Netlify.
+- El `ETag` de Express está desactivado: evita respuestas `304` que dejaban al `HttpClient` de Angular sin datos.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Colección de Postman
 
-## License
+Importar `postman/coleccion.json`: incluye alta, consulta, modificación y borrado de ambas entidades, el filtro por categoría y los casos de error (400, 404 y 409).
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+## Estructura
+
+```text
+src/
+  categorias/   controlador, servicio, DTOs y entidad
+  recetas/      controlador, servicio, DTOs y entidad
+  app.module.ts ConfigModule y TypeOrmModule
+  main.ts       bootstrap, CORS y ValidationPipe
+```
+
+## Deploy en Render
+
+- Build command: `npm install && npm run build`
+- Start command: `npm run start:prod`
+- Variable de entorno: `DATABASE_URL` (o las variables `DB_*`). `PORT` la asigna Render.
+- `synchronize: true` crea las tablas al arrancar (práctico para el TP; en producción se usarían migraciones).
+- URL desplegada: `https://tp-web-backend-jejw.onrender.com`
+- En el plan Free el servicio duerme: la primera request después de un rato puede tardar ~30 s.
+
+## Scripts
+
+`npm run start:dev`, `npm run build`, `npm run start:prod`, `npm run test`.
+
+## Documentación
+
+- [Módulos](https://docs.nestjs.com/modules) · [Controllers](https://docs.nestjs.com/controllers) · [Providers](https://docs.nestjs.com/providers)
+- [DTOs y validación](https://docs.nestjs.com/techniques/validation) · [Pipes](https://docs.nestjs.com/pipes) · [Excepciones](https://docs.nestjs.com/exception-filters)
+- [TypeORM](https://docs.nestjs.com/recipes/sql-typeorm) · [Configuración](https://docs.nestjs.com/techniques/configuration)
+- [Colecciones de Postman](https://learning.postman.com/docs/collections/collections-overview/)
